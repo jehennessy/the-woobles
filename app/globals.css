@@ -156,6 +156,10 @@ button:hover {
     justify-content: flex-start;
     gap: 36px;
   }
+
+  .product-card {
+    max-width: calc(1200px / 4 - 36px);
+  }
 }
 
 @media (max-width: 1200px) {
