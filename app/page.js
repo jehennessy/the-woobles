@@ -1,95 +1,74 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { promises as fs } from 'fs';
+import Featured from "./featured";
+import ProductGrid from "./product-grid";
 
-export default function Home() {
+export default async function LandingPage() {
+  const productsFile = await fs.readFile(process.cwd() + '/app/products.json', 'utf8');
+  const productsData = JSON.parse(productsFile);
+
+  let featuredWooble = false;
+  let beginnerKits = {products: []};
+  let beginnerPlusKits = {products: []};
+  let bundles = {products: []};
+  let intermediateKits = {products: []};
+  let accessoryKits = {products: []};
+
+  productsData.products.forEach((product) => {
+    if (product.tags.includes('Featured')) {
+      if(!featuredWooble) {
+        featuredWooble = product;
+      }
+    } else if (product.title.includes('Bundle') || product.title.includes('bundle')) {
+      bundles.products.push(product);
+    } else if (product.product_type === 'Beginner' || product.product_type === 'Beginner Kit') {
+      beginnerKits.products.push(product);
+    } else if (product.product_type === 'Beginner+' || product.product_type === 'Beginner+ Kit') {
+      beginnerPlusKits.products.push(product);
+    } else if (product.product_type === 'Intermediate' || product.product_type === 'Intermediate Kit') {
+      intermediateKits.products.push(product);
+    } else if (product.product_type === 'Accessory' || product.product_type === 'Accessory Kit') {
+      accessoryKits.products.push(product);
+    }
+  });
+
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+    <div className="landing-page">
+      <main className="main-container">
+        {featuredWooble ? (
+          <Featured {...featuredWooble} />
+        ) : ''}
+        {beginnerKits.products.length > 0 ? (
+          <div className="product-section--container product-section--beginner-kits">
+            <h2 className="product-section--title">Beginner Kits</h2>
+            <ProductGrid {...beginnerKits}/>
+          </div>
+        ) : ''}
+        {beginnerPlusKits.products.length > 0 ? (
+          <div className="product-section--container product-section--beginner-plus-kits">
+            <h2 className="product-section--title">Beginner+ Kits</h2>
+            <ProductGrid {...beginnerPlusKits}/>
+          </div>
+        ) : ''}
+        {bundles.products.length > 0 ? (
+          <div className="product-section--container product-section--bundles">
+            <h2 className="product-section--title">Bundles</h2>
+            <ProductGrid {...bundles}/>
+          </div>
+        ) : ''}
+        {intermediateKits.products.length > 0 ? (
+          <div className="product-section--container product-section--intermediate-kits">
+            <h2 className="product-section--title">Intermediate Kits</h2>
+            <ProductGrid {...intermediateKits}/>
+          </div>
+        ) : ''}
+        {accessoryKits.products.length > 0 ? (
+          <div className="product-section--container product-section--accessory-kits">
+            <h2 className="product-section--title">Accessory Kits</h2>
+            <ProductGrid {...accessoryKits}/>
+          </div>
+        ) : ''}
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
-}
+} 
