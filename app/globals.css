@@ -159,6 +159,7 @@ button:hover {
 
   .product-card {
     max-width: calc(1200px / 4 - 36px);
+    min-width: 250px;
   }
 }
 
